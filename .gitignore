@@ -57,3 +57,8 @@ playwright/.cache/
 ehthumbs.db
 Thumbs.db
 [Dd]esktop.ini
+
+# Documents
+Lab 5.pdf
+lab5.pdf
+*.pdf
