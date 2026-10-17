@@ -6,6 +6,19 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "mocha"
+    "test": "mocha test/test.js",
+    "test:unit": "mocha test/test.js",
+    "test:integration": "jest tests/integration --runInBand --env=node"
+  },
+  "devDependencies": {
+    "jest": "^30.5.2",
+    "socket.io-client": "^4.8.4",
+    "supertest": "^7.3.1"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/tests/e2e/"
+    ]
   }
 }
