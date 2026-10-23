@@ -1,0 +1,10 @@
+https://github.com/RobertoUNA/Lab-5-Seguridad-UnaChat.git
+https://github.com/RobertoUNA/Lab-5-Seguridad-UnaChat
+
+Laboratorio 5: Seguridad Informatica - SecDevOps (UNA Chat)
+Estudiante: Roberto Campos Calvo
+
+Comandos de ejecucion (desde la carpeta 'antes'):
+1. Pruebas Unitarias: npm run test:unit
+2. Pruebas de Integracion: npm run test:integration
+3. Pruebas End-to-End: npx playwright test --project=chromium --headed
