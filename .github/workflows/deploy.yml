@@ -8,7 +8,41 @@ permissions:
   contents: read
 
 jobs:
+  test:
+    name: Ejecutar pruebas
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./antes
+    steps:
+      - name: Descargar codigo del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: antes/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar pruebas unitarias (Mocha)
+        run: npm run test:unit
+
+      - name: Ejecutar pruebas de integracion (Jest + Supertest)
+        run: npm run test:integration
+
+      - name: Instalar navegador Chromium para Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Ejecutar pruebas End-to-End (Playwright)
+        run: npm run test:e2e
+
   deploy:
+    name: Solicitar despliegue en Render
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Solicitar despliegue
