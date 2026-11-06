@@ -1,0 +1,14 @@
+{
+  "name": "unachat",
+  "version": "1.0.0",
+  "description": "UNA Chat Server",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node antes/server.js"
+  },
+  "dependencies": {
+    "@sentry/node": "^8.48.0",
+    "express": "*",
+    "socket.io": "*"
+  }
+}
