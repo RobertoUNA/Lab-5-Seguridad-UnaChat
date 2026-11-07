@@ -4,20 +4,58 @@
     <title>Chat Socket.IO UNA</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
+      body { font: 13px Helvetica, Arial; background-color: #f7f3ea; }
+      header {
+        background: #1e332d;
+        color: #ffffff;
+        padding: 12px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      header h1 { font-size: 18px; font-weight: 600; }
+      .header-actions { display: flex; gap: 10px; align-items: center; }
+      .btn-auth0 {
+        background: #e5b342;
+        color: #1e332d;
+        padding: 8px 16px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 13px;
+        transition: background 0.2s;
+      }
+      .btn-auth0:hover { background: #f0c359; }
+      .btn-sala {
+        background: transparent;
+        color: #ffffff;
+        border: 1px solid #ffffff;
+        padding: 7px 14px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 13px;
+      }
       form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
       form input { border: 0; padding: 10px;}
-      form button { width: 10%; background: rgb(130, 224, 255);  border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
+      form button { width: 10%; background: rgb(130, 224, 255);  border: none; padding: 10px; cursor: pointer; }
+      #messages { list-style-type: none; margin: 0; padding: 15px; }
+      #messages li { padding: 8px 12px; margin-bottom: 6px; background: #fff; border-radius: 4px; }
       #messages li:nth-child(odd) { background: #eee; }
-      #messages { margin-bottom: 40px }
+      #messages { margin-bottom: 50px }
       #nombre, #m { display: inline-block;}
       #m {width: 69%; margin-right: 4px;}
       #nombre {width: 20%}
     </style>
   </head>
   <body>
+    <header>
+      <h1>Chat Socket.IO UNA</h1>
+      <div class="header-actions">
+        <a href="/sala" class="btn-sala">Entrar a la Sala (/sala)</a>
+        <a href="/auth/login" class="btn-auth0" id="login-auth0-btn">Iniciar sesión con Auth0</a>
+      </div>
+    </header>
+
     <ul id="messages"></ul>
     <form action="">
       <input id="nombre" autocomplete="off" placeholder="Username"/>
@@ -26,48 +64,49 @@
     <script src="https://cdn.socket.io/4.7.2/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
+      var colorHexTxt = "";
 
-    var colorHexTxt = "";
+      // Verificar si ya hay sesion iniciada
+      $.getJSON('/auth/me', function(user) {
+        if (user && user.name) {
+          $('#login-auth0-btn').text('Cerrar sesión (' + user.name + ')').attr('href', '/auth/logout');
+          $('#nombre').val(user.name);
+        }
+      });
 
-    // genera colores aleatorios en hexadeximal
-    function getRandomColor() {
+      // genera colores aleatorios en hexadecimal
+      function getRandomColor() {
         var letters = '0123456789ABCDEF';
         var color = '#';
         for (var i = 0; i < 6; i++) {
           color += letters[Math.floor(Math.random() * 16)];
         }
-
         return color;
-     }
+      }
 
       $(function () {
         var socket = io();
 
-        // emite evento al servidor
-        
         $('form').submit(function(){
-            var nombreTxt = $('#nombre').val() || "Anomimo";
-            var mensajeTxt = $('#m').val();
+          var nombreTxt = $('#nombre').val() || "Anonimo";
+          var mensajeTxt = $('#m').val();
 
-            if (colorHexTxt == "") {
-                colorHexTxt = getRandomColor();
-            }
+          if (colorHexTxt == "") {
+            colorHexTxt = getRandomColor();
+          }
 
-            var jsonMsg = { nombre: nombreTxt, mensaje: mensajeTxt, color: colorHexTxt };
-            socket.emit('Evento-Mensaje-Server', JSON.stringify(jsonMsg));
-            $('#m').val('');
-            return false;
+          var jsonMsg = { nombre: nombreTxt, mensaje: mensajeTxt, color: colorHexTxt };
+          socket.emit('Evento-Mensaje-Server', JSON.stringify(jsonMsg));
+          $('#m').val('');
+          return false;
         });
-
-        // ... (resto del código) ...
 
         socket.on('Evento-Mensaje-Server', function(msg){
-            var msgJson = JSON.parse(msg);
-            var mensajeDisplay = "<b style='color:"+ msgJson.color +"'>" + msgJson.nombre + "</b>: " + msgJson.mensaje;
-            $('#messages').append($('<li>').html(mensajeDisplay));
-            window.scrollTo(0, document.body.scrollHeight);
+          var msgJson = typeof msg === 'string' ? JSON.parse(msg) : msg;
+          var mensajeDisplay = "<b style='color:"+ msgJson.color +"'>" + msgJson.nombre + "</b>: " + msgJson.mensaje;
+          $('#messages').append($('<li>').html(mensajeDisplay));
+          window.scrollTo(0, document.body.scrollHeight);
         });
-
       });
     </script>
   </body>

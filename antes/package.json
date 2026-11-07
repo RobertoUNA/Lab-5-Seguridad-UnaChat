@@ -1,8 +1,12 @@
 {
   "dependencies": {
     "@sentry/node": "^11.11.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^18.0.9",
     "express": "*",
+    "express-session": "^1.19.0",
     "mocha": "^10.2.0",
+    "pg": "^8.23.1",
     "socket.io": "*"
   },
   "scripts": {
