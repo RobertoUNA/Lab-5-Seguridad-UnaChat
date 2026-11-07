@@ -24,6 +24,7 @@ if (process.env.SENTRY_DSN) {
 }
 
 var app = express();
+app.set('trust proxy', 1); // Necesario para proxies HTTPS como Render
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
@@ -39,7 +40,8 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production' && !process.env.APP_BASE_URL?.startsWith('http://localhost'),
+    secure: 'auto', // Se adapta automaticamente a conexiones HTTPS detras de proxy
+    sameSite: 'lax',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000 // 24 horas
   }
@@ -147,7 +149,13 @@ app.get('/auth/callback', async function(req, res) {
       email: profile.email || ''
     };
 
-    res.redirect('/sala');
+    req.session.save(function(saveErr) {
+      if (saveErr) {
+        console.error('Error al guardar sesion:', saveErr);
+        return res.status(500).send('Error guardando sesion de usuario.');
+      }
+      res.redirect('/sala');
+    });
   } catch (err) {
     console.error('Error en /auth/callback:', err);
     res.status(500).send('Error interno procesando callback de autenticacion.');
